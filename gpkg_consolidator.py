@@ -136,26 +136,28 @@ def process_geopackage(input_gpkg: Path,
             subprocess.run(cmd, check=True, capture_output=True)
             tqdm.write(f"Processed layer: {layer} from {input_gpkg.name}")
         except subprocess.CalledProcessError as e:
-            tqdm.write(f"Error processing layer: {layer} from {input_gpkg.name}", err=True)
-            tqdm.write(f"Error message: {e.stderr.decode()}", err=True)
+            tqdm.write(f"Error processing layer: {layer} from {input_gpkg.name}")
+            tqdm.write(f"Error message: {e.stderr.decode()}")
 
 def create_spatial_indexes(gpkg: Path) -> None:
     """Create spatial indexes for all layers in a GeoPackage."""
-    tqdm.write(f"Creating spatial indexes for {gpkg}")
-    try:
-        subprocess.run(
-            [
-                "ogrinfo",
-                str(gpkg),
-                "-sql",
-                "SELECT CreateSpatialIndex(TABLE_NAME, GEOMETRY_COLUMN_NAME) "
-                "FROM gpkg_geometry_columns",
-            ],
-            check=True,
-            capture_output=True
-        )
-    except subprocess.CalledProcessError as e:
-        tqdm.write(f"Error creating spatial indexes: {e.stderr.decode()}", err=True)
+    # TODO: Implement more robust spatial index creation with ogr and osr 
+    # tqdm.write(f"Creating spatial indexes for {gpkg}")
+    # try:
+        # subprocess.run(
+            # [
+                # "ogrinfo",
+                # str(gpkg),
+                # "-sql",
+                # "SELECT CreateSpatialIndex(TABLE_NAME, GEOMETRY_COLUMN_NAME) "
+                # "FROM gpkg_geometry_columns",
+            # ],
+            # check=True,
+            # capture_output=True
+        # )
+    # except subprocess.CalledProcessError as e:
+        # tqdm.write(f"Error creating spatial indexes: {e.stderr.decode()}")
+    pass
 
 @click.command()
 @click.argument(
@@ -204,14 +206,14 @@ def consolidate_gpkg(
     gpkg_count: int = len(gpkg_files)
 
     if gpkg_count == 0:
-        tqdm.write("Error: No GeoPackages found in the input directory.", err=True)
+        tqdm.write("Error: No GeoPackages found in the input directory.")
         return
 
     if output_gpkg.exists():
         if overwrite:
             output_gpkg.unlink()
         elif not update:
-            tqdm.write(f"Error: Output file {output_gpkg} already exists. Use --overwrite to replace or --update to add to it.", err=True)
+            tqdm.write(f"Error: Output file {output_gpkg} already exists. Use --overwrite to replace or --update to add to it.")
             return
 
     construct_ogr_command = generate_ogr_constructor(keep_separate, output_gpkg, append, update)
@@ -221,7 +223,7 @@ def consolidate_gpkg(
             if validate_geopackage(gpkg):
                 process_geopackage(gpkg, construct_ogr_command)
             else:
-                tqdm.write(f"Skipping invalid GeoPackage: {gpkg.name}", err=True)
+                tqdm.write(f"Skipping invalid GeoPackage: {gpkg.name}")
             pbar.update(1)
 
     if spatial_index:
