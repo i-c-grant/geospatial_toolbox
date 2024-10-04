@@ -25,6 +25,6 @@ Contributions, bug reports, and feature requests are welcome. Feel free to submi
 These tools are provided "as is" without warranty of any kind. Use at your own risk. The author is not responsible for any damage or data loss that may occur from using these tools.
 
 ## License
-
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 
