@@ -6,9 +6,6 @@ These are custom-built geospatial tools I've developed and found useful in my ow
 
 ### 1. GeoPackage Consolidator
 - Consolidates multiple GeoPackage files into a single output GeoPackage.
-- Available as a Bash script and a Python Click application.
-
-### [Additional tools to be listed here]
 
 ## Requirements
 
