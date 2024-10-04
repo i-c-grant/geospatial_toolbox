@@ -49,6 +49,8 @@ from tqdm import tqdm
 
 def validate_geopackage(gpkg: Path) -> bool:
     """Check if a file is a valid GeoPackage."""
+    if not gpkg.exists():
+        return False
     try:
         subprocess.run(
             ["ogrinfo", "-so", "-q", str(gpkg)],
@@ -60,15 +62,22 @@ def validate_geopackage(gpkg: Path) -> bool:
 
 def get_layers(gpkg: Path) -> List[str]:
     """Get a list of layer names from a GeoPackage."""
-    result = subprocess.run(
-        ["ogrinfo", "-so", str(gpkg)],
-        capture_output=True, text=True, check=True
-    )
-    return [
-        line.split(":")[1].strip()
-        for line in result.stdout.split("\n")
-        if line.startswith("1: ")
-    ]
+    if not gpkg.exists():
+        return []
+    try:
+        result = subprocess.run(
+            ["ogrinfo", "-so", str(gpkg)],
+            capture_output=True, text=True, check=True
+        )
+        return [
+            # TODO: make more robust by using ogr
+            line.split(":")[1].strip().split(" ")[0]
+            for line in result.stdout.splitlines()
+            if line.startswith("Layer name:")
+        ]
+    except subprocess.CalledProcessError as e:
+        tqdm.write(f"Error getting layers from {gpkg}: {e.stderr}")
+        return []
 
 def get_unique_layer_name(base_name: str, output_gpkg: Path) -> str:
     """Generate a unique layer name to avoid conflicts in the output GeoPackage."""
