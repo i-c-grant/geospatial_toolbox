@@ -26,4 +26,5 @@ These tools are provided "as is" without warranty of any kind. Use at your own r
 
 ## License
 
-[Insert your chosen license here]
+
+
