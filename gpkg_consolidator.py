@@ -128,14 +128,18 @@ def generate_ogr_constructor(keep_separate: bool,
 def process_geopackage(input_gpkg: Path,
                        construct_ogr_command: Callable) -> None:
     """Process a single input GeoPackage, writing its layers to the output."""
+
     input_layers = get_layers(input_gpkg)
-    
+
     for layer in input_layers:
         cmd = construct_ogr_command(input_gpkg, layer)
+        
         try:
             subprocess.run(cmd, check=True, capture_output=True)
+            tqdm.write(f"Ran command: {' '.join(cmd)}")
             tqdm.write(f"Processed layer: {layer} from {input_gpkg.name}")
         except subprocess.CalledProcessError as e:
+            tqdm.write(f"Error running command: {' '.join(cmd)}")
             tqdm.write(f"Error processing layer: {layer} from {input_gpkg.name}")
             tqdm.write(f"Error message: {e.stderr.decode()}")
 
